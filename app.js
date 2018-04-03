@@ -1,41 +1,30 @@
 var express = require("express");
 var app = express();
 var bodyParser = require('body-parser');
+var mongoose = require("mongoose");
+
+mongoose.connect('mongodb://localhost/propertyDB');
+
+const propertySchema = new mongoose.Schema({
+    price: Number,
+    url: String,
+    address: String,
+    description: String
+});
+var Property = mongoose.model("Property", propertySchema);
 
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
 
-var properties = [
-    {
-        price: "550",
-        url: "https://myupdatestudio.com/wp-content/uploads/2018/01/3-BHKvilla-copy.jpg",
-        address: "4051 Southern Trace Dr, College Station, TX 77845",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ut ante leo. Vestibulum ac ullamcorper urna. Duis tempus auctor risus, sed viverra sapien gravida et. Cras hendrerit iaculis sapien, ac volutpat purus egestas gravida"
-    },
-    {
-        price: "550",
-        url: "http://chennaibestproperties.com/wp-content/uploads/2015/06/about_us.jpg",
-        address: "4051 Southern Trace Dr, College Station, TX 77845",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ut ante leo. Vestibulum ac ullamcorper urna. Duis tempus auctor risus, sed viverra sapien gravida et. Cras hendrerit iaculis sapien, ac volutpat purus egestas gravida"
-    },
-    {
-        price: "550",
-        url: "http://roitoledo.com/public/uploads/sites/2017_11_28_02_03_40_1__3property-sale-2.jpg",
-        address: "4051 Southern Trace Dr, College Station, TX 77845",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ut ante leo. Vestibulum ac ullamcorper urna. Duis tempus auctor risus, sed viverra sapien gravida et. Cras hendrerit iaculis sapien, ac volutpat purus egestas gravida"
-    },
-    {
-        price: "550",
-        url: "https://myupdatestudio.com/wp-content/uploads/2018/01/clubhousewelcome2i-min.jpg",
-        address: "4051 Southern Trace Dr, College Station, TX 77845",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ut ante leo. Vestibulum ac ullamcorper urna. Duis tempus auctor risus, sed viverra sapien gravida et. Cras hendrerit iaculis sapien, ac volutpat purus egestas gravida"
-    }
-];
-
-
 app.get("/", function(req, res){
-    res.render("home", {properties: properties});
+    Property.find({}, function(err, properties){
+        if (err){
+            console.log("ERROR!!!");
+        } else {
+            res.render("home", {properties: properties});
+        }
+    })
 });
 
 app.get("/properties/new", function(req, res){
@@ -43,9 +32,16 @@ app.get("/properties/new", function(req, res){
 });
 
 app.post("/properties", function(req, res){
-    console.log(req.body.property);
-    properties.push(req.body.property);
-    res.redirect("/");
+    console.log("Property from the view: " + JSON.stringify(req.body.property));
+    Property.create(req.body.property, function(err, createdProperty){
+        if(err){
+            console.log(err);
+        } else {
+            console.log("Property created: " + createdProperty);
+            res.redirect("/");
+        }
+    })
+
 });
 
 app.get("/test", function(req, res){
