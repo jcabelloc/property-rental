@@ -1,5 +1,10 @@
 var express = require("express");
 var app = express();
+var bodyParser = require('body-parser');
+
+app.use(bodyParser.urlencoded({extended: true}));
+
+app.set("view engine", "ejs");
 
 var properties = [
     {
@@ -30,11 +35,21 @@ var properties = [
 
 
 app.get("/", function(req, res){
-    res.render("home.ejs", {properties: properties});
+    res.render("home", {properties: properties});
+});
+
+app.get("/properties/new", function(req, res){
+    res.render("properties/new");
+});
+
+app.post("/properties", function(req, res){
+    console.log(req.body.property);
+    properties.push(req.body.property);
+    res.redirect("/");
 });
 
 app.get("/test", function(req, res){
-    res.render("test.ejs", {properties: properties});
+    res.render("test", {properties: properties});
 });
 
 app.listen(3000, function(req, res){
