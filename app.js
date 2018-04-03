@@ -18,18 +18,35 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
 app.get("/", function(req, res){
+    res.render("home");
+});
+
+app.get("/properties", function(req, res){
     Property.find({}, function(err, properties){
         if (err){
             console.log("ERROR!!!");
         } else {
-            res.render("home", {properties: properties});
+            res.render("properties/index", {properties: properties});
         }
     })
 });
 
+
 app.get("/properties/new", function(req, res){
     res.render("properties/new");
 });
+
+app.get("/properties/:id", function(req, res){
+   Property.findById(req.params.id, function(err, foundProperty){
+        if (err) {
+            console.log("Error finding property");
+        } else{
+            console.log(foundProperty);
+            res.render("properties/show", {property: foundProperty});
+        }
+   })
+});
+
 
 app.post("/properties", function(req, res){
     console.log("Property from the view: " + JSON.stringify(req.body.property));

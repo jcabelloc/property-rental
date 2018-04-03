@@ -1,0 +1,22 @@
+<% include ../partials/header %>
+<div class="container">
+    <h1>Property Rental</h1>
+    <p> 
+        You will see <%= properties.length %> properties
+    </p>
+    <div class="row">
+        <% properties.forEach(function(property){ %>
+            <div class="col-md-3 col-sm-6">
+                <div class="card">
+                    <img class="card-img-top" src="<%= property.url %>" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">$ <%= property.price %></h5>
+                        <p class="card-text"><%= property.address %></p>
+                        <a href="/properties/<%= property._id %>" class="btn btn-primary">Details</a>
+                    </div>
+                </div>
+            </div>
+        <% }); %>
+    </div>
+
+<% include ../partials/footer %>
