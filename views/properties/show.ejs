@@ -14,6 +14,25 @@
             </div>
         </div>
     </div>
+    
+    <div class="row">
+        <div class="col-md-9">
+            <hr>
+            <div class="card-header">
+                Questions
+                <a href="/properties/<%=property._id%>/questions/new" class="float-right btn btn-sm btn-success">New Question</a>
+            </div>
+            <div class="card-footer text-muted">
+                <% property.questions.forEach(function(question){ %>
+                    <div class="row">
+                            <div class="col">
+                                <p> <strong>Author: </strong> <%= question.question %></p>
+                            </div>
+                        </div>
+                <% }); %>
+            </div>
+        </div>
+    </div>
 </div>
 
 <% include ../partials/footer %>

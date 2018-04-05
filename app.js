@@ -5,12 +5,26 @@ var mongoose = require("mongoose");
 
 mongoose.connect('mongodb://localhost/propertyDB');
 
+const questionSchema = new mongoose.Schema({
+    question: String,
+    answer: String
+});
+
+var Question = mongoose.model("Question", questionSchema);
+
 const propertySchema = new mongoose.Schema({
     price: Number,
     url: String,
     address: String,
-    description: String
+    description: String,
+    questions: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Question"
+        }
+    ]
 });
+
 var Property = mongoose.model("Property", propertySchema);
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -37,11 +51,10 @@ app.get("/properties/new", function(req, res){
 });
 
 app.get("/properties/:id", function(req, res){
-   Property.findById(req.params.id, function(err, foundProperty){
+   Property.findById(req.params.id).populate("questions").exec(function(err, foundProperty){
         if (err) {
             console.log("Error finding property");
         } else{
-            console.log(foundProperty);
             res.render("properties/show", {property: foundProperty});
         }
    })
@@ -61,9 +74,36 @@ app.post("/properties", function(req, res){
 
 });
 
-app.get("/test", function(req, res){
-    res.render("test", {properties: properties});
+app.get("/properties/:id/questions/new", function(req, res){
+    res.render("questions/new", {id: req.params.id});
 });
+
+app.post("/properties/:id/questions", function(req, res){
+    console.log(req.body.question);
+    Question.create(req.body.question, function (err, createdQuestion){
+        if (err){
+            console.log("ERROR saving question");
+        } else {
+            Property.findById(req.params.id, function(err, foundProperty){
+                if(err){
+                    console.log("ERROR finding property when saving question");
+                } else {
+                    foundProperty.questions.push(createdQuestion);
+                    foundProperty.save(function(err, updatedProperty){
+                        if(err){
+                            console.log("ERROR updating property with new question");
+                        } else{
+                            console.log(updatedProperty);
+                            res.redirect("/properties/" + foundProperty._id);
+                        }
+                    });
+                }
+            })
+        }
+    });
+});
+
+
 
 app.listen(3000, function(req, res){
     console.log("Server Started");
