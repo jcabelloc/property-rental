@@ -10,6 +10,10 @@
                     <h5 class="card-title">$ <%= property.price %></h5>
                     <p class="card-text"><%= property.address %></p>
                     <p class="card-text"><%= property.description %></p>
+                    <a class="float-right btn btn-warning btn-sm" href="/properties/<%= property._id %>/edit">Edit</a>
+                    <form class="float-right mr-1" action="/properties/<%= property._id %>?_method=DELETE" method="POST">
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
                 </div>
             </div>
         </div>

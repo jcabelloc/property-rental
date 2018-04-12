@@ -2,6 +2,7 @@ var express = require("express");
 var app = express();
 var bodyParser = require('body-parser');
 var mongoose = require("mongoose");
+var methodOverride = require("method-override");
 
 mongoose.connect('mongodb://localhost/propertyDB');
 
@@ -30,11 +31,14 @@ var Property = mongoose.model("Property", propertySchema);
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.set("view engine", "ejs");
+app.use(methodOverride("_method"));
+
 
 app.get("/", function(req, res){
     res.render("home");
 });
 
+// Property ROUTES
 app.get("/properties", function(req, res){
     Property.find({}, function(err, properties){
         if (err){
@@ -74,6 +78,38 @@ app.post("/properties", function(req, res){
 
 });
 
+app.get("/properties/:id/edit", function(req, res){
+    Property.findById(req.params.id, function(err, foundProperty){
+        if (err){
+            console.log("Error finding property to edit");
+        } else {
+            res.render("properties/edit", {property: foundProperty});
+        }
+    });
+});
+
+app.put("/properties/:id", function(req, res){
+    Property.findByIdAndUpdate(req.params.id, req.body.property, function(err, updatedProperty){
+        if(err){
+            console.log("ERROR updating property");
+        } else {
+            res.redirect("/properties/" + updatedProperty.id);
+        }
+    })
+    console.log(req.body.property);
+});
+
+app.delete("/properties/:id", function(req, res){
+    Property.findByIdAndRemove(req.params.id, function(err){
+        if(err){
+            console.log("Error deleting property");
+        } else {
+            res.redirect("/properties");
+        }
+    });
+});
+
+// Question ROUTES
 app.get("/properties/:id/questions/new", function(req, res){
     res.render("questions/new", {id: req.params.id});
 });
