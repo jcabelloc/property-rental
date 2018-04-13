@@ -114,8 +114,8 @@ app.get("/properties/:id/questions/new", function(req, res){
     res.render("questions/new", {id: req.params.id});
 });
 
+
 app.post("/properties/:id/questions", function(req, res){
-    console.log(req.body.question);
     Question.create(req.body.question, function (err, createdQuestion){
         if (err){
             console.log("ERROR saving question");
@@ -139,7 +139,35 @@ app.post("/properties/:id/questions", function(req, res){
     });
 });
 
+app.get("/properties/:id/questions/:questionId/edit", function(req, res){
+    Question.findById(req.params.questionId, function(err, foundQuestion){
+        if(err){
+            console.log("Error finding question");
+        } else {
+            res.render("questions/edit", {propertyId: req.params.id, question: foundQuestion});
+        }
+    })
+});
 
+app.put("/properties/:id/questions/:questionId", function(req, res){
+    Question.findByIdAndUpdate(req.params.questionId, req.body.question, function(err, updatedQuestion){
+        if(err){
+            console.log("Error Updating Question");
+        } else {
+            res.redirect("/properties/" + req.params.id);
+        }
+    })
+});
+
+app.delete("/properties/:id/questions/:questionId", function(req, res){
+    Question.findByIdAndRemove(req.params.questionId, function(err){
+        if(err){
+            console.log("error deleting question");
+        } else {
+            res.redirect("/properties/" + req.params.id);
+        }
+    });
+})
 
 app.listen(3000, function(req, res){
     console.log("Server Started");

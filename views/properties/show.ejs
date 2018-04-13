@@ -28,11 +28,20 @@
             </div>
             <div class="card-footer text-muted">
                 <% property.questions.forEach(function(question){ %>
-                    <div class="row">
-                            <div class="col">
-                                <p> <strong>Author: </strong> <%= question.question %></p>
+                    <div class="row ">
+                        <div class="col">
+                            <div class="float-right" >
+                                <a href="/properties/<%=property._id%>/questions/<%=question._id%>/edit"><i class="fas fa-edit"></i></a>
+                                <form class="float-right" action="/properties/<%= property._id %>/questions/<%=question._id%>?_method=DELETE" method="POST">
+                                    <button class="btn btn-link p-0 mx-1 my-0 border-0 align-top"><i class="far fa-trash-alt"></i></button>
+                                </form>
                             </div>
+                            <h6 class="mb-0"> Jhon Baily</h6>
+                            <small class="text-muted"><em>Last updated 3 mins ago</em></small>
+                            <p> <%= question.question %></p>
+                            <p class="ml-2"> <em>Morbi congue et ante sed aliquam. Curabitur quis egestas ante. Curabitur ornare libero quis blandit posuere. Vestibulum eu egestas enim. Nullam dignissim porta ligula vel cursus</em></p>
                         </div>
+                    </div>
                 <% }); %>
             </div>
         </div>
