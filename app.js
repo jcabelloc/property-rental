@@ -3,30 +3,11 @@ var app = express();
 var bodyParser = require('body-parser');
 var mongoose = require("mongoose");
 var methodOverride = require("method-override");
+var Property = require("./models/property");
+var Question = require("./models/question");
 
 mongoose.connect('mongodb://localhost/propertyDB');
 
-const questionSchema = new mongoose.Schema({
-    question: String,
-    answer: String
-});
-
-var Question = mongoose.model("Question", questionSchema);
-
-const propertySchema = new mongoose.Schema({
-    price: Number,
-    url: String,
-    address: String,
-    description: String,
-    questions: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Question"
-        }
-    ]
-});
-
-var Property = mongoose.model("Property", propertySchema);
 
 app.use(bodyParser.urlencoded({extended: true}));
 
