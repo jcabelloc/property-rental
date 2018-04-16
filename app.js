@@ -1,18 +1,55 @@
 var express = require("express");
-var app = express();
 var bodyParser = require('body-parser');
 var mongoose = require("mongoose");
 var methodOverride = require("method-override");
 var Property = require("./models/property");
 var Question = require("./models/question");
+var User = require("./models/user");
+var passport = require("passport");
+var LocalStrategy = require("passport-local");
+var session = require("express-session");
 
 mongoose.connect('mongodb://localhost/propertyDB');
 
+var app = express();
 
 app.use(bodyParser.urlencoded({extended: true}));
-
 app.set("view engine", "ejs");
 app.use(methodOverride("_method"));
+
+app.use(session({
+    secret: "Neque porro quisquam est",
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+//passport.use(new LocalStrategy(User.authenticate()));
+
+// AUTH ROUTES
+// show sign up form
+app.get("/register", function(req, res){
+    res.render("register");
+});
+
+// handling user sign up
+app.post("/register", function(req, res){
+
+    User.register(new User({username: req.body.username}), req.body.password, function(err, user){
+        if(err){
+            console.log(err);
+            return res.redirect("/register");
+        }
+        passport.authenticate("local")(req, res, function(){
+            res.redirect("/properties");
+        });
+    });
+});
+
 
 
 app.get("/", function(req, res){
